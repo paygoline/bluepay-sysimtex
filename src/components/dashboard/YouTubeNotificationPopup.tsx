@@ -60,9 +60,9 @@ const YouTubeNotificationPopup = ({ isOpen, onClose }: YouTubeNotificationPopupP
         
         <div className="space-y-4">
           <div className="text-center">
-            <div className="bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-700 text-white p-4 rounded-lg mb-4 animate-pulse">
-              <h3 className="text-lg font-bold mb-2">🎉✨ HAPPY NEW MONTH! 🎊🥳</h3>
-              <p className="text-sm">💫 Wishing you a month filled with blessings, success, and beautiful moments! ⭐</p>
+            <div className="bg-gradient-to-r from-green-600 via-white to-green-600 p-4 rounded-lg mb-4 animate-pulse border-2 border-green-700">
+              <h3 className="text-lg font-bold mb-2 text-green-800">🇳🇬 HAPPY INDEPENDENCE DAY! 🎉✨</h3>
+              <p className="text-sm text-green-900">💚 Celebrating Nigeria's freedom and unity! Wishing you joy, peace, and prosperity! 🤍💚</p>
             </div>
             
             <div className="bg-gray-50 p-3 rounded-lg mb-4">
