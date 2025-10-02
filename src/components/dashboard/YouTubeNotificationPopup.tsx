@@ -60,9 +60,9 @@ const YouTubeNotificationPopup = ({ isOpen, onClose }: YouTubeNotificationPopupP
         
         <div className="space-y-4">
           <div className="text-center">
-            <div className="bg-gradient-to-r from-green-600 via-white to-green-600 p-4 rounded-lg mb-4 animate-pulse border-2 border-green-700">
-              <h3 className="text-lg font-bold mb-2 text-green-800">🇳🇬 HAPPY INDEPENDENCE DAY! 🎉✨</h3>
-              <p className="text-sm text-green-900">💚 Celebrating Nigeria's freedom and unity! Wishing you joy, peace, and prosperity! 🤍💚</p>
+            <div className="bg-gradient-to-r from-red-600 via-yellow-500 to-red-600 p-4 rounded-lg mb-4 animate-pulse border-2 border-red-700">
+              <h3 className="text-lg font-bold mb-2 text-red-900">⚠️ IMPORTANT NOTICE! ⚠️</h3>
+              <p className="text-sm text-red-900 font-semibold">🚫 Only buy your BPC CODE from this app! Do NOT buy from other people to avoid scams! ✅</p>
             </div>
             
             <div className="bg-gray-50 p-3 rounded-lg mb-4">
@@ -92,8 +92,8 @@ const YouTubeNotificationPopup = ({ isOpen, onClose }: YouTubeNotificationPopupP
             </div>
 
             <p className="text-sm text-gray-600 mb-4">
-              Don't miss out on exclusive content, updates, and the biggest live event of the year! 
-              Subscribe now to get notified and be part of the BluePay community.
+              For your safety and security, always purchase BPC codes directly through our official app. 
+              Subscribe to our YouTube channel for updates, tutorials, and exclusive content about BluePay!
             </p>
           </div>
 
