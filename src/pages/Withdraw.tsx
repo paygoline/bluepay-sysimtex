@@ -29,7 +29,7 @@ const Withdraw = () => {
     "Ecobank", "Sterling Bank", "Union Bank", "Wema Bank", "FCMB", "Polaris Bank",
     "Stanbic IBTC", "Heritage Bank", "Keystone Bank", "Jaiz Bank", "Unity Bank",
     "Providus Bank", "TAJBank", "SunTrust Bank", "Globus Bank", "Premium Trust Bank",
-    "Kuda Bank", "Moniepoint", "PalmPay", "OPay", "VFD Microfinance Bank",
+    "Kuda Bank", "Moniepoint", "PalmPay", "OPay", "MOMO PSB", "VFD Microfinance Bank",
     "Brass Bank", "Carbon", "Sparkle", "Rubies Bank", "Mint Digital Bank",
   ];
 
