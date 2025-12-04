@@ -1,13 +1,34 @@
-
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy } from "lucide-react";
+import { ArrowLeft, Copy, Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+
+const paymentAccounts = [
+  {
+    id: 1,
+    bankName: "SMARTCASH PSB",
+    accountNumber: "0014272262",
+    accountName: "MAMUDA ABDULLAHI",
+  },
+  {
+    id: 2,
+    bankName: "PALMPAY",
+    accountNumber: "9014699586",
+    accountName: "EMMANUEL PHILIP",
+  },
+  {
+    id: 3,
+    bankName: "OPAY",
+    accountNumber: "9014699586",
+    accountName: "EMMANUEL PHILIP",
+  },
+];
 
 const BuyBPCPayment = () => {
   const navigate = useNavigate();
   const [showOpayAlert, setShowOpayAlert] = useState(true);
+  const [selectedAccount, setSelectedAccount] = useState(paymentAccounts[0]);
 
   const handleCopy = (text: string, type: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -79,9 +100,30 @@ const BuyBPCPayment = () => {
         </button>
       </div>
 
-      <div className="flex flex-col items-center p-4 mb-4">
+      <div className="flex flex-col items-center p-4 mb-2">
         <h1 className="text-3xl font-bold mb-1">NGN 6,200</h1>
         <p className="text-gray-600 text-sm">BPC Code Purchase</p>
+      </div>
+
+      {/* Bank Selection */}
+      <div className="mx-4 mb-3">
+        <p className="text-gray-700 text-sm font-medium mb-2">Select Payment Bank:</p>
+        <div className="flex flex-wrap gap-2">
+          {paymentAccounts.map((account) => (
+            <button
+              key={account.id}
+              onClick={() => setSelectedAccount(account)}
+              className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
+                selectedAccount.id === account.id
+                  ? "bg-blue-600 text-white border-blue-600"
+                  : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+              }`}
+            >
+              {selectedAccount.id === account.id && <Check size={16} />}
+              {account.bankName}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div className="bg-blue-50 mx-4 p-3 rounded-lg">
@@ -89,6 +131,7 @@ const BuyBPCPayment = () => {
           Instructions:
         </h3>
         <ol className="list-decimal pl-4 text-blue-700 space-y-1 text-sm">
+          <li>Select your preferred bank above</li>
           <li>Copy the account details below</li>
           <li>Open your bank app and make a transfer</li>
           <li>Return here and click "I have made this bank Transfer"</li>
@@ -116,12 +159,12 @@ const BuyBPCPayment = () => {
         <div className="mb-3 border-t pt-3">
           <p className="text-gray-500 text-xs">Account Number</p>
           <div className="flex justify-between items-center">
-            <p className="text-lg font-bold">0014272262</p>
+            <p className="text-lg font-bold">{selectedAccount.accountNumber}</p>
             <Button
               variant="default"
               size="sm"
               className="bg-blue-600 hover:bg-blue-700 flex items-center gap-1"
-              onClick={() => handleCopy("0014272262", "Account Number")}
+              onClick={() => handleCopy(selectedAccount.accountNumber, "Account Number")}
             >
               <Copy size={14} />
               Copy
@@ -131,12 +174,12 @@ const BuyBPCPayment = () => {
 
         <div className="mb-3 border-t pt-3">
           <p className="text-gray-500 text-xs">Bank Name</p>
-          <p className="text-lg font-bold">SMARTCASH PSB</p>
+          <p className="text-lg font-bold">{selectedAccount.bankName}</p>
         </div>
 
         <div className="mb-3 border-t pt-3">
           <p className="text-gray-500 text-xs">Account Name</p>
-          <p className="text-lg font-bold">MAMUDA ABDULLAHI</p>
+          <p className="text-lg font-bold">{selectedAccount.accountName}</p>
         </div>
       </div>
 
