@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy, Check } from "lucide-react";
+import { ArrowLeft, Copy, Check, Building2, Wallet, Smartphone, Banknote, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 
@@ -10,30 +10,35 @@ const paymentAccounts = [
     bankName: "SMARTCASH PSB",
     accountNumber: "0014272262",
     accountName: "MAMUDA ABDULLAHI",
+    icon: Building2,
   },
   {
     id: 2,
     bankName: "PALMPAY",
     accountNumber: "9014699586",
     accountName: "EMMANUEL PHILIP",
+    icon: Wallet,
   },
   {
     id: 3,
     bankName: "OPAY",
     accountNumber: "9014699586",
     accountName: "EMMANUEL PHILIP",
+    icon: Smartphone,
   },
   {
     id: 4,
     bankName: "MONIEPOINT",
     accountNumber: "9014699586",
     accountName: "EMMANUEL PHILIP",
+    icon: Banknote,
   },
   {
     id: 5,
     bankName: "KUDA",
     accountNumber: "9014699586",
     accountName: "EMMANUEL PHILIP",
+    icon: CreditCard,
   },
 ];
 
@@ -121,20 +126,23 @@ const BuyBPCPayment = () => {
       <div className="mx-4 mb-3">
         <p className="text-gray-700 text-sm font-medium mb-2">Select Payment Bank:</p>
         <div className="flex flex-wrap gap-2">
-          {paymentAccounts.map((account) => (
-            <button
-              key={account.id}
-              onClick={() => setSelectedAccount(account)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
-                selectedAccount.id === account.id
-                  ? "bg-blue-600 text-white border-blue-600"
-                  : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
-              }`}
-            >
-              {selectedAccount.id === account.id && <Check size={16} />}
-              {account.bankName}
-            </button>
-          ))}
+          {paymentAccounts.map((account) => {
+            const Icon = account.icon;
+            return (
+              <button
+                key={account.id}
+                onClick={() => setSelectedAccount(account)}
+                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
+                  selectedAccount.id === account.id
+                    ? "bg-blue-600 text-white border-blue-600"
+                    : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+                }`}
+              >
+                {selectedAccount.id === account.id ? <Check size={16} /> : <Icon size={16} />}
+                {account.bankName}
+              </button>
+            );
+          })}
         </div>
       </div>
 
