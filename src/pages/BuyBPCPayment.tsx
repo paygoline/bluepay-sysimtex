@@ -3,6 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Copy, Check, Building2, Wallet, Smartphone, Banknote, CreditCard } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 const paymentAccounts = [
   {
@@ -46,6 +56,7 @@ const BuyBPCPayment = () => {
   const navigate = useNavigate();
   const [showOpayAlert, setShowOpayAlert] = useState(true);
   const [selectedAccount, setSelectedAccount] = useState(paymentAccounts[0]);
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handleCopy = (text: string, type: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -210,11 +221,28 @@ const BuyBPCPayment = () => {
       <div className="px-4 mb-6">
         <Button
           className="bg-blue-600 hover:bg-blue-700 w-full py-4 text-base font-semibold"
-          onClick={handlePaymentConfirm}
+          onClick={() => setShowConfirmDialog(true)}
         >
           I have made this bank Transfer
         </Button>
       </div>
+
+      <AlertDialog open={showConfirmDialog} onOpenChange={setShowConfirmDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Confirm Payment</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you have completed the bank transfer of NGN 6,200 to {selectedAccount.bankName} ({selectedAccount.accountNumber})?
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>No, Go Back</AlertDialogCancel>
+            <AlertDialogAction onClick={handlePaymentConfirm} className="bg-blue-600 hover:bg-blue-700">
+              Yes, I've Paid
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };
