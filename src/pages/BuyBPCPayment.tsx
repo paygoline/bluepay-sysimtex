@@ -23,6 +23,18 @@ const paymentAccounts = [
     accountNumber: "9014699586",
     accountName: "EMMANUEL PHILIP",
   },
+  {
+    id: 4,
+    bankName: "MONIEPOINT",
+    accountNumber: "9014699586",
+    accountName: "EMMANUEL PHILIP",
+  },
+  {
+    id: 5,
+    bankName: "KUDA",
+    accountNumber: "9014699586",
+    accountName: "EMMANUEL PHILIP",
+  },
 ];
 
 const BuyBPCPayment = () => {
