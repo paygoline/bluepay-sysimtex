@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy, Check, Building2, Wallet, Smartphone, Banknote, CreditCard } from "lucide-react";
+import { ArrowLeft, Copy, Check, Building2, Wallet, Smartphone, Banknote, CreditCard, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
 import {
@@ -52,11 +52,44 @@ const paymentAccounts = [
   },
 ];
 
+const TIMER_DURATION = 30 * 60; // 30 minutes in seconds
+
 const BuyBPCPayment = () => {
   const navigate = useNavigate();
   const [showOpayAlert, setShowOpayAlert] = useState(true);
   const [selectedAccount, setSelectedAccount] = useState(paymentAccounts[0]);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
+
+  useEffect(() => {
+    if (timeLeft <= 0) {
+      toast({
+        title: "Session Expired",
+        description: "Your payment session has expired. Please start again.",
+        variant: "destructive",
+      });
+      navigate("/buy-bpc");
+      return;
+    }
+
+    const timer = setInterval(() => {
+      setTimeLeft((prev) => prev - 1);
+    }, 1000);
+
+    return () => clearInterval(timer);
+  }, [timeLeft, navigate]);
+
+  const formatTime = (seconds: number) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins.toString().padStart(2, "0")}:${secs.toString().padStart(2, "0")}`;
+  };
+
+  const getTimerColor = () => {
+    if (timeLeft <= 60) return "text-red-600 bg-red-100";
+    if (timeLeft <= 300) return "text-orange-600 bg-orange-100";
+    return "text-blue-600 bg-blue-100";
+  };
 
   const handleCopy = (text: string, type: string) => {
     navigator.clipboard.writeText(text).then(() => {
@@ -131,6 +164,13 @@ const BuyBPCPayment = () => {
       <div className="flex flex-col items-center p-4 mb-2">
         <h1 className="text-3xl font-bold mb-1">NGN 6,200</h1>
         <p className="text-gray-600 text-sm">BPC Code Purchase</p>
+        
+        {/* Countdown Timer */}
+        <div className={`flex items-center gap-2 mt-3 px-4 py-2 rounded-full ${getTimerColor()}`}>
+          <Clock size={18} />
+          <span className="font-bold text-lg">{formatTime(timeLeft)}</span>
+          <span className="text-sm">remaining</span>
+        </div>
       </div>
 
       {/* Bank Selection */}
