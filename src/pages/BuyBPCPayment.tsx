@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Copy, Check, Building2, Wallet, Smartphone, Banknote, CreditCard, Clock } from "lucide-react";
+import { ArrowLeft, Copy, Check, Building2, Wallet, Smartphone, Banknote, CreditCard, Clock, LucideIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -14,43 +15,21 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const paymentAccounts = [
-  {
-    id: 1,
-    bankName: "SMARTCASH PSB",
-    accountNumber: "0014272262",
-    accountName: "MAMUDA ABDULLAHI",
-    icon: Building2,
-  },
-  {
-    id: 2,
-    bankName: "PALMPAY",
-    accountNumber: "9014699586",
-    accountName: "EMMANUEL PHILIP",
-    icon: Wallet,
-  },
-  {
-    id: 3,
-    bankName: "OPAY",
-    accountNumber: "9014699586",
-    accountName: "EMMANUEL PHILIP",
-    icon: Smartphone,
-  },
-  {
-    id: 4,
-    bankName: "MONIEPOINT",
-    accountNumber: "9014699586",
-    accountName: "EMMANUEL PHILIP",
-    icon: Banknote,
-  },
-  {
-    id: 5,
-    bankName: "KUDA",
-    accountNumber: "9014699586",
-    accountName: "EMMANUEL PHILIP",
-    icon: CreditCard,
-  },
-];
+interface PaymentAccount {
+  id: string;
+  bank_name: string;
+  account_number: string;
+  account_name: string;
+  icon_name: string;
+}
+
+const iconMap: Record<string, LucideIcon> = {
+  Building2,
+  Wallet,
+  Smartphone,
+  Banknote,
+  CreditCard,
+};
 
 const TIMER_DURATION = 30 * 60; // 30 minutes in seconds
 const NOTIFICATION_TIME = 25 * 60; // 25 minutes in seconds - when to play sound
@@ -58,10 +37,32 @@ const NOTIFICATION_TIME = 25 * 60; // 25 minutes in seconds - when to play sound
 const BuyBPCPayment = () => {
   const navigate = useNavigate();
   const [showOpayAlert, setShowOpayAlert] = useState(true);
-  const [selectedAccount, setSelectedAccount] = useState(paymentAccounts[0]);
+  const [paymentAccounts, setPaymentAccounts] = useState<PaymentAccount[]>([]);
+  const [selectedAccount, setSelectedAccount] = useState<PaymentAccount | null>(null);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
+  const [loading, setLoading] = useState(true);
   const hasPlayedNotification = useRef(false);
+
+  useEffect(() => {
+    const fetchAccounts = async () => {
+      const { data, error } = await supabase
+        .from("payment_accounts")
+        .select("*")
+        .eq("is_active", true)
+        .order("display_order", { ascending: true });
+
+      if (error) {
+        toast({ title: "Error", description: "Failed to load payment accounts", variant: "destructive" });
+      } else if (data && data.length > 0) {
+        setPaymentAccounts(data);
+        setSelectedAccount(data[0]);
+      }
+      setLoading(false);
+    };
+
+    fetchAccounts();
+  }, []);
 
   const playNotificationSound = () => {
     const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
@@ -206,25 +207,29 @@ const BuyBPCPayment = () => {
       {/* Bank Selection */}
       <div className="mx-4 mb-3">
         <p className="text-gray-700 text-sm font-medium mb-2">Select Payment Bank:</p>
-        <div className="flex flex-wrap gap-2">
-          {paymentAccounts.map((account) => {
-            const Icon = account.icon;
-            return (
-              <button
-                key={account.id}
-                onClick={() => setSelectedAccount(account)}
-                className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
-                  selectedAccount.id === account.id
-                    ? "bg-blue-600 text-white border-blue-600"
-                    : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
-                }`}
-              >
-                {selectedAccount.id === account.id ? <Check size={16} /> : <Icon size={16} />}
-                {account.bankName}
-              </button>
-            );
-          })}
-        </div>
+        {loading ? (
+          <p className="text-gray-500 text-sm">Loading accounts...</p>
+        ) : (
+          <div className="flex flex-wrap gap-2">
+            {paymentAccounts.map((account) => {
+              const Icon = iconMap[account.icon_name] || Building2;
+              return (
+                <button
+                  key={account.id}
+                  onClick={() => setSelectedAccount(account)}
+                  className={`flex items-center gap-2 px-3 py-2 rounded-lg border text-sm font-medium transition-all ${
+                    selectedAccount?.id === account.id
+                      ? "bg-blue-600 text-white border-blue-600"
+                      : "bg-white text-gray-700 border-gray-300 hover:border-blue-400"
+                  }`}
+                >
+                  {selectedAccount?.id === account.id ? <Check size={16} /> : <Icon size={16} />}
+                  {account.bank_name}
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <div className="bg-blue-50 mx-4 p-3 rounded-lg">
@@ -260,12 +265,13 @@ const BuyBPCPayment = () => {
         <div className="mb-3 border-t pt-3">
           <p className="text-gray-500 text-xs">Account Number</p>
           <div className="flex justify-between items-center">
-            <p className="text-lg font-bold">{selectedAccount.accountNumber}</p>
+            <p className="text-lg font-bold">{selectedAccount?.account_number || "-"}</p>
             <Button
               variant="default"
               size="sm"
               className="bg-blue-600 hover:bg-blue-700 flex items-center gap-1"
-              onClick={() => handleCopy(selectedAccount.accountNumber, "Account Number")}
+              onClick={() => selectedAccount && handleCopy(selectedAccount.account_number, "Account Number")}
+              disabled={!selectedAccount}
             >
               <Copy size={14} />
               Copy
@@ -275,12 +281,12 @@ const BuyBPCPayment = () => {
 
         <div className="mb-3 border-t pt-3">
           <p className="text-gray-500 text-xs">Bank Name</p>
-          <p className="text-lg font-bold">{selectedAccount.bankName}</p>
+          <p className="text-lg font-bold">{selectedAccount?.bank_name || "-"}</p>
         </div>
 
         <div className="mb-3 border-t pt-3">
           <p className="text-gray-500 text-xs">Account Name</p>
-          <p className="text-lg font-bold">{selectedAccount.accountName}</p>
+          <p className="text-lg font-bold">{selectedAccount?.account_name || "-"}</p>
         </div>
       </div>
 
@@ -302,7 +308,7 @@ const BuyBPCPayment = () => {
           <AlertDialogHeader>
             <AlertDialogTitle>Confirm Payment</AlertDialogTitle>
             <AlertDialogDescription>
-              Are you sure you have completed the bank transfer of NGN 6,200 to {selectedAccount.bankName} ({selectedAccount.accountNumber})?
+              Are you sure you have completed the bank transfer of NGN 6,200 to {selectedAccount?.bank_name} ({selectedAccount?.account_number})?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

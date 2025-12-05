@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from "react";
-import { MessageCircle } from "lucide-react";
+import { MessageCircle, CreditCard } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 const Admin = () => {
@@ -62,11 +62,18 @@ const Admin = () => {
           {/* Admin section */}
           <div className="px-8 py-6 mt-4 border-t border-gray-700">
             <div 
-              className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-3 rounded-lg"
+              className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-3 rounded-lg mb-3"
               onClick={handleAdminClick}
             >
               <MessageCircle className="text-white h-9 w-9" />
-              <span className="text-white text-2xl font-bold">Admin</span>
+              <span className="text-white text-2xl font-bold">Contact Admin</span>
+            </div>
+            <div 
+              className="flex items-center space-x-4 cursor-pointer hover:bg-gray-800 p-3 rounded-lg"
+              onClick={() => navigate("/admin/payment-accounts")}
+            >
+              <CreditCard className="text-white h-9 w-9" />
+              <span className="text-white text-2xl font-bold">Payment Accounts</span>
             </div>
           </div>
 
