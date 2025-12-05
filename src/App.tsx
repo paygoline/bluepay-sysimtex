@@ -22,6 +22,7 @@ import AirtimePurchase from "./pages/AirtimePurchase";
 import DataPurchase from "./pages/DataPurchase";
 import Support from "./pages/Support";
 import Admin from "./pages/Admin";
+import AdminPaymentAccounts from "./pages/AdminPaymentAccounts";
 import Faq from "./pages/Faq";
 import Platform from "./pages/Platform";
 import EarnMore from "./pages/EarnMore";
@@ -104,6 +105,7 @@ const App = () => (
           <Route path="/data" element={<DataPurchase />} />
           <Route path="/support" element={<Support />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/payment-accounts" element={<AdminPaymentAccounts />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/platform" element={<Platform />} />
           <Route path="/earn-more" element={<EarnMore />} />
