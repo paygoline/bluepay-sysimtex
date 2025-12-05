@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { ArrowLeft, Copy, Check, Building2, Wallet, Smartphone, Banknote, CreditCard, Clock } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -53,6 +53,7 @@ const paymentAccounts = [
 ];
 
 const TIMER_DURATION = 30 * 60; // 30 minutes in seconds
+const NOTIFICATION_TIME = 25 * 60; // 25 minutes in seconds - when to play sound
 
 const BuyBPCPayment = () => {
   const navigate = useNavigate();
@@ -60,6 +61,25 @@ const BuyBPCPayment = () => {
   const [selectedAccount, setSelectedAccount] = useState(paymentAccounts[0]);
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [timeLeft, setTimeLeft] = useState(TIMER_DURATION);
+  const hasPlayedNotification = useRef(false);
+
+  const playNotificationSound = () => {
+    const audioContext = new (window.AudioContext || (window as any).webkitAudioContext)();
+    const oscillator = audioContext.createOscillator();
+    const gainNode = audioContext.createGain();
+    
+    oscillator.connect(gainNode);
+    gainNode.connect(audioContext.destination);
+    
+    oscillator.frequency.setValueAtTime(800, audioContext.currentTime);
+    oscillator.type = "sine";
+    
+    gainNode.gain.setValueAtTime(0.3, audioContext.currentTime);
+    gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + 0.5);
+    
+    oscillator.start(audioContext.currentTime);
+    oscillator.stop(audioContext.currentTime + 0.5);
+  };
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -70,6 +90,16 @@ const BuyBPCPayment = () => {
       });
       navigate("/buy-bpc");
       return;
+    }
+
+    // Play notification sound at 25 minutes remaining (5 minutes after start)
+    if (timeLeft === NOTIFICATION_TIME && !hasPlayedNotification.current) {
+      hasPlayedNotification.current = true;
+      playNotificationSound();
+      toast({
+        title: "Time Reminder",
+        description: "You have 25 minutes remaining to complete your transfer.",
+      });
     }
 
     const timer = setInterval(() => {
