@@ -23,6 +23,7 @@ import DataPurchase from "./pages/DataPurchase";
 import Support from "./pages/Support";
 import Admin from "./pages/Admin";
 import AdminPaymentAccounts from "./pages/AdminPaymentAccounts";
+import AdminAuth from "./pages/AdminAuth";
 import Faq from "./pages/Faq";
 import Platform from "./pages/Platform";
 import EarnMore from "./pages/EarnMore";
@@ -105,6 +106,7 @@ const App = () => (
           <Route path="/data" element={<DataPurchase />} />
           <Route path="/support" element={<Support />} />
           <Route path="/admin" element={<Admin />} />
+          <Route path="/admin/auth" element={<AdminAuth />} />
           <Route path="/admin/payment-accounts" element={<AdminPaymentAccounts />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/platform" element={<Platform />} />
