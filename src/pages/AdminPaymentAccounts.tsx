@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ArrowLeft, Plus, Pencil, Trash2, Save, X, Building2, Wallet, Smartphone, Banknote, CreditCard } from "lucide-react";
+import { ArrowLeft, Plus, Pencil, Trash2, Save, X, Building2, Wallet, Smartphone, Banknote, CreditCard, LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -50,8 +50,9 @@ const AdminPaymentAccounts = () => {
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showAddForm, setShowAddForm] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>(null);
-  const [adminPin, setAdminPin] = useState("");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [checkingAuth, setCheckingAuth] = useState(true);
+  const [userEmail, setUserEmail] = useState<string | null>(null);
   
   const [formData, setFormData] = useState({
     bank_name: "",
@@ -62,13 +63,58 @@ const AdminPaymentAccounts = () => {
     display_order: 0,
   });
 
-  const ADMIN_PIN = "1234"; // Simple PIN protection - change this
-
   useEffect(() => {
-    if (isAuthenticated) {
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (session?.user) {
+          setUserEmail(session.user.email || null);
+          setTimeout(() => {
+            checkAdminRole(session.user.id);
+          }, 0);
+        } else {
+          setIsAuthenticated(false);
+          setCheckingAuth(false);
+          navigate("/admin/auth");
+        }
+      }
+    );
+
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      if (session?.user) {
+        setUserEmail(session.user.email || null);
+        checkAdminRole(session.user.id);
+      } else {
+        setCheckingAuth(false);
+        navigate("/admin/auth");
+      }
+    });
+
+    return () => subscription.unsubscribe();
+  }, [navigate]);
+
+  const checkAdminRole = async (userId: string) => {
+    const { data, error } = await supabase
+      .from("user_roles")
+      .select("role")
+      .eq("user_id", userId)
+      .eq("role", "admin")
+      .maybeSingle();
+
+    if (data) {
+      setIsAuthenticated(true);
+      setCheckingAuth(false);
       fetchAccounts();
+    } else {
+      setCheckingAuth(false);
+      toast({
+        title: "Access Denied",
+        description: "You don't have admin privileges",
+        variant: "destructive",
+      });
+      await supabase.auth.signOut();
+      navigate("/admin/auth");
     }
-  }, [isAuthenticated]);
+  };
 
   const fetchAccounts = async () => {
     setLoading(true);
@@ -85,13 +131,9 @@ const AdminPaymentAccounts = () => {
     setLoading(false);
   };
 
-  const handlePinSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (adminPin === ADMIN_PIN) {
-      setIsAuthenticated(true);
-    } else {
-      toast({ title: "Error", description: "Invalid PIN", variant: "destructive" });
-    }
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    navigate("/admin/auth");
   };
 
   const handleSave = async (id: string) => {
@@ -165,45 +207,33 @@ const AdminPaymentAccounts = () => {
     return option ? option.icon : Building2;
   };
 
-  if (!isAuthenticated) {
+  if (checkingAuth) {
     return (
-      <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4">
-        <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm">
-          <h1 className="text-2xl font-bold text-center mb-6">Admin Access</h1>
-          <form onSubmit={handlePinSubmit}>
-            <Label htmlFor="pin">Enter Admin PIN</Label>
-            <Input
-              id="pin"
-              type="password"
-              value={adminPin}
-              onChange={(e) => setAdminPin(e.target.value)}
-              placeholder="Enter PIN"
-              className="mt-2 mb-4"
-              maxLength={4}
-            />
-            <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
-              Access Admin Panel
-            </Button>
-          </form>
-          <Button
-            variant="ghost"
-            className="w-full mt-4"
-            onClick={() => navigate("/dashboard")}
-          >
-            Back to Dashboard
-          </Button>
-        </div>
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center">
+        <p className="text-gray-500">Verifying admin access...</p>
       </div>
     );
   }
 
+  if (!isAuthenticated) {
+    return null;
+  }
+
   return (
     <div className="min-h-screen bg-gray-100">
-      <header className="bg-[#222222] text-white py-3 px-4 flex items-center sticky top-0 z-10">
-        <button onClick={() => navigate("/dashboard")} className="mr-3">
-          <ArrowLeft size={24} />
-        </button>
-        <h1 className="text-xl font-semibold">Payment Accounts</h1>
+      <header className="bg-[#222222] text-white py-3 px-4 flex items-center justify-between sticky top-0 z-10">
+        <div className="flex items-center">
+          <button onClick={() => navigate("/dashboard")} className="mr-3">
+            <ArrowLeft size={24} />
+          </button>
+          <h1 className="text-xl font-semibold">Payment Accounts</h1>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-300 hidden sm:block">{userEmail}</span>
+          <Button size="sm" variant="ghost" onClick={handleLogout} className="text-white hover:bg-white/10">
+            <LogOut size={18} />
+          </Button>
+        </div>
       </header>
 
       <div className="p-4">
